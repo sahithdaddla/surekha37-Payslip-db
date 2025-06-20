@@ -8,10 +8,10 @@ const port = 3000;
 
 // PostgreSQL database connection
 const pool = new Pool({
-    user: 'postgres', // Replace with your PostgreSQL username
+    user: 'postgres', 
     host: 'localhost',
-    database: 'payslip_db', // Replace with your database name
-    password: 'root', // Replace with your PostgreSQL password
+    database: 'payslip_db', 
+    password: 'root', 
     port: 5432,
 });
 
