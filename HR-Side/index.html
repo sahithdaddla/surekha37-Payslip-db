@@ -1,0 +1,1085 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payslip Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 900px;
+            margin: auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .page-header {
+            background: linear-gradient(135deg, #3972f6 0%, #1a4fcf 100%);
+            color: white;
+            padding: 25px 30px;
+            margin: -30px -30px 30px -30px;
+            border-radius: 8px 8px 0 0;
+            box-shadow: 0 3px 5px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        .page-header h2 {
+            margin: 0;
+            font-size: 28px;
+            letter-spacing: 0.5px;
+            position: relative;
+            z-index: 2;
+        }
+        .page-header::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 200px;
+            height: 100%;
+            background-image: linear-gradient(45deg, transparent 50%, rgba(255,255,255,0.1) 50%);
+            z-index: 1;
+        }
+        .header-subtitle {
+            font-size: 14px;
+            opacity: 0.85;
+            margin-top: 5px;
+            font-weight: normal;
+            position: relative;
+            z-index: 2;
+        }
+        .header-icon {
+            position: absolute;
+            right: 30px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 32px;
+            opacity: 0.8;
+            z-index: 2;
+        }
+        .form-row {
+            display: flex;
+            flex-wrap: wrap;
+            margin: 0 -10px;
+        }
+        .column {
+            flex: 1;
+            padding: 0 10px;
+            min-width: 250px;
+        }
+        .form-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            transition: border-color 0.3s;
+            box-sizing: border-box;
+        }
+        .error-message {
+            color: #d9534f;
+            font-size: 0.8em;
+            display: none;
+            margin-top: 5px;
+            position: absolute;
+            bottom: -20px;
+        }
+        .form-group.error input, .form-group.error select {
+            border-color: #d9534f;
+        }
+        .form-group.error .error-message {
+            display: block;
+        }
+        .section-title {
+            color: #333;
+            border-bottom: 2px solid #3972f6;
+            padding-bottom: 10px;
+            margin-top: 20px;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        .generate-btn {
+            background-color: #3972f6;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 20px;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+        .generate-btn:hover {
+            background-color:#2955b8;
+        }
+        @media print {
+            .no-print {
+                display: none;
+            }
+        }
+        .required-star {
+            color: #d9534f;
+            margin-left: 3px;
+        }
+        @media (max-width: 768px) {
+            .column {
+                flex: 100%;
+                margin-bottom: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="page-header">
+            <div class="header-icon">💼</div>
+            <h2>Payslip Generator</h2>
+        </div>
+        
+        <form id="payslipForm">
+            <h3 class="section-title">Employee Details</h3>
+            
+            <div class="form-row">
+                <div class="column">
+                    <div class="form-group" id="empNameGroup">
+                        <label>Employee Name:<span class="required-star">*</span></label>
+                        <input type="text" id="empName" required maxlength="50">
+                        <div class="error-message">Name must be 2-50 alphabets only (spaces allowed)</div>
+                    </div>
+                </div>
+                <div class="column">
+                    <div class="form-group" id="empCodeGroup">
+                        <label>Employee Code:<span class="required-star">*</span></label>
+                        <input type="text" id="empCode" required maxlength="7">
+                        <div class="error-message">Code must be ATS0 followed by 3 digits (not 000)</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="column">
+                    <div class="form-group" id="empTypeGroup">
+                        <label>Employee Type:<span class="required-star">*</span></label>
+                        <select id="empType" required>
+                            <option value="" disabled selected>Select Type</option>
+                            <option value="Permanent">Permanent</option>
+                            <option value="Contract">Contract</option>
+                        </select>
+                        <div class="error-message">Please select an employee type</div>
+                    </div>
+                </div>
+                <div class="column">
+                    <div class="form-group" id="designationGroup">
+                        <label>Designation:<span class="required-star">*</span></label>
+                        <input type="text" id="designation" required>
+                        <div class="error-message">Designation must be at least 2 characters</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="column">
+                    <div class="form-group" id="panGroup">
+                        <label>PAN:<span class="required-star">*</span></label>
+                        <input type="text" id="pan" required maxlength="10">
+                        <div class="error-message">PAN must be 5 letters + 4 digits + 1 letter</div>
+                    </div>
+                </div>
+                <div class="column">
+                    <div class="form-group" id="accountNoGroup">
+                        <label>Bank Account Number:<span class="required-star">*</span></label>
+                        <input type="text" id="accountNo" required>
+                        <div class="error-message">Account number must be 9-18 digits</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="column">
+                    <div class="form-group" id="bankNameGroup">
+                        <label>Bank Name:<span class="required-star">*</span></label>
+                        <input type="text" id="bankName" required>
+                        <div class="error-message">Bank name must be 2-50 characters</div>
+                    </div>
+                </div>
+                <div class="column">
+                    <div class="form-group">
+                        <label>Location:<span class="required-star">*</span></label>
+                        <input type="text" id="location" required>
+                        <div class="error-message">Location must be at least 3 characters</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="column">
+                    <div class="form-group">
+                        <label>Date of Joining:<span class="required-star">*</span></label>
+                        <input type="date" id="doj" required>
+                    </div>
+                </div>
+                <div class="column">
+                    <div class="form-group">
+                        <label>Payslip Month:<span class="required-star">*</span></label>
+                        <input type="month" id="payslipMonth" required>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="column">
+                    <div class="form-group">
+                        <label>Total Days in Month:<span class="required-star">*</span></label>
+                        <input type="number" id="totalDays" min="28" max="31" required readonly>
+                    </div>
+                </div>
+                <div class="column">
+                    <div class="form-group">
+                        <label>Working Days:<span class="required-star">*</span></label>
+                        <input type="number" id="workingDays" min="1" max="31" required>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="column">
+                    <div class="form-group">
+                        <label>Days Attended:<span class="required-star">*</span></label>
+                        <input type="number" id="daysAttended" min="0" required>
+                        <div class="error-message">Cannot exceed working days</div>
+                    </div>
+                </div>
+                <div class="column">
+                    <div class="form-group">
+                        <label>Loss of Pay Days (LOP):</label>
+                        <input type="number" id="lopDays" min="0" value="0">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="column">
+                    <div class="form-group">
+                        <label>Arrear Days:</label>
+                        <input type="number" id="arrearDays" min="0" value="0">
+                    </div>
+                </div>
+                <div class="column">
+                    <div class="form-group">
+                        <label>Provident Fund Number:</label>
+                        <input type="text" id="pfNumber">
+                        <div class="error-message">Must be 13 characters or 'N/A' (if provided)</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="column">
+                    <div class="form-group">
+                        <label>ESIC Number:</label>
+                        <input type="text" id="esicNumber">
+                        <div class="error-message">Must be 17 digits or 'N/A' (if provided)</div>
+                    </div>
+                </div>
+                <div class="column">
+                    <div class="form-group">
+                        <label>UAN Number:</label>
+                        <input type="text" id="uanNumber">
+                        <div class="error-message">Must be 12 digits or 'N/A' (if provided)</div>
+                    </div>
+                </div>
+            </div>
+            
+            <h3 class="section-title">Earnings</h3>
+            
+            <div class="form-row">
+                <div class="column">
+                    <div class="form-group">
+                        <label>Basic Salary:<span class="required-star">*</span></label>
+                        <input type="number" id="basicSalary" min="0" required>
+                        <div class="error-message">Minimum 100 rupees</div>
+                    </div>
+                </div>
+                <div class="column">
+                    <div class="form-group">
+                        <label>House Rent Allowance:<span class="required-star">*</span></label>
+                        <input type="number" id="hra" min="0" required>
+                        <div class="error-message">Minimum 100 rupees</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="column">
+                    <div class="form-group">
+                        <label>Education Allowance:<span class="required-star">*</span></label>
+                        <input type="number" id="educationAllowance" min="0" required>
+                        <div class="error-message">Minimum 100 rupees</div>
+                    </div>
+                </div>
+                <div class="column">
+                    <div class="form-group">
+                        <label>Bonus/Ex-gratia:<span class="required-star">*</span></label>
+                        <input type="number" id="bonus" min="0" required>
+                        <div class="error-message">Minimum 100 rupees</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="column">
+                    <div class="form-group">
+                        <label>Other Allowance:<span class="required-star">*</span></label>
+                        <input type="number" id="otherAllowance" min="0" required>
+                        <div class="error-message">Minimum 100 rupees</div>
+                    </div>
+                </div>
+                <div class="column">
+                    <!-- Empty column for alignment -->
+                </div>
+            </div>
+            
+            <h3 class="section-title">Deductions</h3>
+            
+            <div class="form-row">
+                <div class="column">
+                    <div class="form-group">
+                        <label>Professional Tax:<span class="required-star">*</span></label>
+                        <input type="number" id="professionalTax" min="0" required>
+                        <div class="error-message">Minimum 100 rupees</div>
+                    </div>
+                </div>
+                <div class="column">
+                    <div class="form-group">
+                        <label>Labour Welfare Fund:<span class="required-star">*</span></label>
+                        <input type="number" id="labourWelfare" min="0" required>
+                        <div class="error-message">Minimum 20 rupees</div>
+                    </div>
+                </div>
+            </div>
+            
+            <button type="submit" class="generate-btn">Generate Payslip</button>
+        </form>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('payslipForm');
+
+        // Function to get days in a month
+        function getDaysInMonth(year, month) {
+            return new Date(year, month, 0).getDate();
+        }
+
+        // Validation functions
+        function validateEmployeeName() {
+            const input = document.getElementById('empName');
+            const group = document.getElementById('empNameGroup');
+            const nameWithoutSpaces = input.value.replace(/\s/g, '');
+            
+            if (nameWithoutSpaces.length < 2 || nameWithoutSpaces.length > 50 || !/^[A-Za-z\s]+$/.test(input.value)) {
+                group.classList.add('error');
+                return false;
+            }
+            group.classList.remove('error');
+            return true;
+        }
+
+        function validateEmployeeCode() {
+            const input = document.getElementById('empCode');
+            const group = document.getElementById('empCodeGroup');
+            const codeRegex = /^ATS0[0-9]{3}$/;
+            
+            // Check format and ensure last three digits are not '000'
+            if (!codeRegex.test(input.value) || input.value.endsWith('000')) {
+                group.classList.add('error');
+                return false;
+            }
+            group.classList.remove('error');
+            return true;
+        }
+
+        function validateEmployeeType() {
+            const input = document.getElementById('empType');
+            const group = document.getElementById('empTypeGroup');
+            
+            if (!input.value) {
+                group.classList.add('error');
+                return false;
+            }
+            group.classList.remove('error');
+            return true;
+        }
+
+        function validateDesignation() {
+            const input = document.getElementById('designation');
+            const group = document.getElementById('designationGroup');
+            const valueWithoutSpaces = input.value.replace(/\s/g, '');
+            
+            if (valueWithoutSpaces.length < 2 || !/^[A-Za-z\s]+$/.test(input.value)) {
+                group.classList.add('error');
+                return false;
+            }
+            group.classList.remove('error');
+            return true;
+        }
+
+        function validatePAN() {
+            const input = document.getElementById('pan');
+            const group = document.getElementById('panGroup');
+            const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
+            
+            if (!panRegex.test(input.value)) {
+                group.classList.add('error');
+                return false;
+            }
+            group.classList.remove('error');
+            return true;
+        }
+
+        function validateAccountNumber() {
+            const input = document.getElementById('accountNo');
+            const group = document.getElementById('accountNoGroup');
+            const accountRegex = /^[0-9]{9,18}$/;
+            
+            if (!accountRegex.test(input.value)) {
+                group.classList.add('error');
+                return false;
+            }
+            group.classList.remove('error');
+            return true;
+        }
+
+        function validateBankName() {
+            const input = document.getElementById('bankName');
+            const group = document.getElementById('bankNameGroup');
+            const valueWithoutSpaces = input.value.replace(/\s/g, '');
+            
+            if (valueWithoutSpaces.length < 2 || valueWithoutSpaces.length > 50 || !/^[A-Za-z\s]+$/.test(input.value)) {
+                group.classList.add('error');
+                return false;
+            }
+            group.classList.remove('error');
+            return true;
+        }
+
+        function validateLocation() {
+            const input = document.getElementById('location');
+            const group = input.closest('.form-group');
+            const valueWithoutSpaces = input.value.replace(/\s/gi, '');
+            
+            if (valueWithoutSpaces.length < 3 || !/^[A-Za-z\s]+$/.test(input.value)) {
+                group.classList.add('error');
+                return false;
+            }
+            group.classList.remove('error');
+            return true;
+        }
+
+        function validateDOJ() {
+            const input = document.getElementById('doj');
+            const group = input.closest('.form-group');
+            
+            if (!input.value) {
+                group.classList.add('error');
+                return false;
+            }
+            group.classList.remove('error');
+            return true;
+        }
+
+        function validateTotalDays() {
+            const payslipMonthInput = document.getElementById('payslipMonth');
+            const totalDaysInput = document.getElementById('totalDays');
+            const group = totalDaysInput.closest('.form-group');
+            
+            if (!payslipMonthInput.value) return true;
+            
+            const [year, month] = payslipMonthInput.value.split('-');
+            const daysInMonth = getDaysInMonth(parseInt(year), parseInt(month));
+            
+            totalDaysInput.value = daysInMonth;
+            return true;
+        }
+
+        function validateWorkingDays() {
+            const payslipMonthInput = document.getElementById('payslipMonth');
+            const workingDaysInput = document.getElementById('workingDays');
+            const group = workingDaysInput.closest('.form-group');
+            
+            if (!payslipMonthInput.value) return true;
+            
+            const [year, month] = payslipMonthInput.value.split('-');
+            const daysInMonth = getDaysInMonth(parseInt(year), parseInt(month));
+            
+            if (parseInt(workingDaysInput.value) > daysInMonth) {
+                group.classList.add('error');
+                let errorMessage = group.querySelector('.error-message');
+                if (!errorMessage) {
+                    errorMessage = document.createElement('div');
+                    errorMessage.className = 'error-message';
+                    group.appendChild(errorMessage);
+                }
+                errorMessage.style.display = 'block';
+                errorMessage.textContent = `Working days cannot exceed ${daysInMonth}`;
+                return false;
+            }
+            
+            group.classList.remove('error');
+            const errorMessage = group.querySelector('.error-message');
+            if (errorMessage) errorMessage.style.display = 'none';
+            return true;
+        }
+
+        function validateDaysAttended() {
+            const workingDays = parseInt(document.getElementById('workingDays').value);
+            const daysAttended = parseInt(document.getElementById('daysAttended').value);
+            const group = document.getElementById('daysAttended').closest('.form-group');
+            
+            if (daysAttended > workingDays) {
+                group.classList.add('error');
+                return false;
+            }
+            
+            group.classList.remove('error');
+            return true;
+        }
+
+        function validateLOPDays() {
+            const workingDays = parseInt(document.getElementById('workingDays').value);
+            const daysAttended = parseInt(document.getElementById('daysAttended').value);
+            const lopDays = parseInt(document.getElementById('lopDays').value) || 0;
+            const group = document.getElementById('lopDays').closest('.form-group');
+            
+            if (lopDays > (workingDays - daysAttended)) {
+                group.classList.add('error');
+                let errorMessage = group.querySelector('.error-message');
+                if (!errorMessage) {
+                    errorMessage = document.createElement('div');
+                    errorMessage.className = 'error-message';
+                    group.appendChild(errorMessage);
+                }
+                errorMessage.style.display = 'block';
+                errorMessage.textContent = `LOP days cannot exceed ${workingDays - daysAttended}`;
+                return false;
+            }
+            
+            group.classList.remove('error');
+            const errorMessage = group.querySelector('.error-message');
+            if (errorMessage) errorMessage.style.display = 'none';
+            return true;
+        }
+
+        function validateArrearDays() {
+            const workingDays = parseInt(document.getElementById('workingDays').value);
+            const arrearDays = parseInt(document.getElementById('arrearDays').value) || 0;
+            const group = document.getElementById('arrearDays').closest('.form-group');
+            
+            if (arrearDays > workingDays) {
+                group.classList.add('error');
+                let errorMessage = group.querySelector('.error-message');
+                if (!errorMessage) {
+                    errorMessage = document.createElement('div');
+                    errorMessage.className = 'error-message';
+                    group.appendChild(errorMessage);
+                }
+                errorMessage.style.display = 'block';
+                errorMessage.textContent = `Arrear days cannot exceed ${workingDays}`;
+                return false;
+            }
+            
+            group.classList.remove('error');
+            const errorMessage = group.querySelector('.error-message');
+            if (errorMessage) errorMessage.style.display = 'none';
+            return true;
+        }
+
+        function validatePFNumber() {
+            const input = document.getElementById('pfNumber');
+            const group = input.closest('.form-group');
+            
+            if (input.value.toUpperCase() === 'N/A') {
+                group.classList.remove('error');
+                return true;
+            }
+            
+            if (input.value && input.value.length !== 13) {
+                group.classList.add('error');
+                return false;
+            }
+            group.classList.remove('error');
+            return true;
+        }
+
+        function validateESICNumber() {
+            const input = document.getElementById('esicNumber');
+            const group = input.closest('.form-group');
+            const esicRegex = /^\d{17}$/;
+            
+            if (input.value.toUpperCase() === 'N/A') {
+                group.classList.remove('error');
+                return true;
+            }
+            
+            if (input.value && !esicRegex.test(input.value)) {
+                group.classList.add('error');
+                return false;
+            }
+            group.classList.remove('error');
+            return true;
+        }
+
+        function validateUANNumber() {
+            const input = document.getElementById('uanNumber');
+            const group = input.closest('.form-group');
+            const uanRegex = /^\d{12}$/;
+            
+            if (input.value.toUpperCase() === 'N/A') {
+                group.classList.remove('error');
+                return true;
+            }
+            
+            if (input.value && !uanRegex.test(input.value)) {
+                group.classList.add('error');
+                return false;
+            }
+            group.classList.remove('error');
+            return true;
+        }
+
+        function validateIncomeField(fieldId, minAmount = 100) {
+            const input = document.getElementById(fieldId);
+            const group = input.closest('.form-group');
+            
+            if (parseFloat(input.value) < minAmount) {
+                group.classList.add('error');
+                return false;
+            }
+            
+            group.classList.remove('error');
+            return true;
+        }
+
+        // Input restriction handlers
+        function restrictToAlphabetsAndSpaces(event) {
+            if (event.key === 'Backspace' || event.key === 'Delete' || 
+                event.key === 'ArrowLeft' || event.key === 'ArrowRight' || 
+                event.key === 'Tab' || event.key === ' ') {
+                if (event.key === ' ' && (this.value.length === 0 || this.value.slice(-1) === ' ')) {
+                    event.preventDefault();
+                }
+                return;
+            }
+            
+            if (!/^[A-Za-z]$/.test(event.key)) {
+                event.preventDefault();
+            }
+            
+            const valueWithoutSpaces = this.value.replace(/\s/g, '');
+            if (valueWithoutSpaces.length >= 50 && event.key !== ' ') {
+                event.preventDefault();
+            }
+        }
+
+        function restrictEmployeeCode(event) {
+            if (event.key === 'Backspace' || event.key === 'Delete' || 
+                event.key === 'ArrowLeft' || event.key === 'ArrowRight' || 
+                event.key === 'Tab') {
+                return;
+            }
+            
+            const currentValue = this.value;
+            
+            if (currentValue.length === 0 && event.key !== 'A') {
+                event.preventDefault();
+                return;
+            }
+            if (currentValue.length === 1 && event.key !== 'T') {
+                event.preventDefault();
+                return;
+            }
+            if (currentValue.length === 2 && event.key !== 'S') {
+                event.preventDefault();
+                return;
+            }
+            if (currentValue.length === 3 && event.key !== '0') {
+                event.preventDefault();
+                return;
+            }
+            if (currentValue.length >= 4 && currentValue.length < 7) {
+                if (!/^\d$/.test(event.key)) {
+                    event.preventDefault();
+                    return;
+                }
+               
+                if (currentValue.length === 6 && event.key === '0' && currentValue.endsWith('000')) {
+                    event.preventDefault();
+                    return;
+                }
+            }
+            if (currentValue.length >= 7) {
+                event.preventDefault();
+            }
+        }
+
+        function restrictPAN(event) {
+            if (event.key === 'Backspace' || event.key === 'Delete' || 
+                event.key === 'ArrowLeft' || event.key === 'ArrowRight' || 
+                event.key === 'Tab') {
+                return;
+            }
+            
+            const currentValue = this.value;
+            
+            if (currentValue.length < 5) {
+                if (!/^[A-Z]$/.test(event.key)) {
+                    event.preventDefault();
+                }
+                return;
+            }
+            if (currentValue.length >= 5 && currentValue.length < 9) {
+                if (!/^\d$/.test(event.key)) {
+                    event.preventDefault();
+                }
+                return;
+            }
+            if (currentValue.length === 9) {
+                if (!/^[A-Z]$/.test(event.key)) {
+                    event.preventDefault();
+                }
+                return;
+            }
+            if (currentValue.length >= 10) {
+                event.preventDefault();
+            }
+        }
+
+        function restrictToDigits(event) {
+            if (event.key === 'Backspace' || event.key === 'Delete' || 
+                event.key === 'ArrowLeft' || event.key === 'ArrowRight' || 
+                event.key === 'Tab') {
+                return;
+            }
+            
+            // Allow 'N', 'n', '/', 'A', 'a' for 'N/A' in ESIC and UAN fields
+            if (['esicNumber', 'uanNumber'].includes(this.id)) {
+                const currentValue = (this.value || '').toUpperCase();
+                const nextValue = (currentValue + event.key.toUpperCase()).slice(0, 3);
+                
+                if (nextValue.match(/^N\/?A?$/)) {
+                    return;
+                }
+            }
+            
+            if (!/^\d$/.test(event.key)) {
+                event.preventDefault();
+            }
+            
+            if (this.id === 'accountNo' && this.value.length >= 18) {
+                event.preventDefault();
+            }
+            if (this.id === 'esicNumber' && this.value.length >= 17 && !this.value.match(/^N\/A$/i)) {
+                event.preventDefault();
+            }
+            if (this.id === 'uanNumber' && this.value.length >= 12 && !this.value.match(/^N\/A$/i)) {
+                event.preventDefault();
+            }
+            if (['workingDays', 'daysAttended', 'lopDays', 'arrearDays'].includes(this.id) && this.value.length >= 2) {
+                event.preventDefault();
+            }
+        }
+
+        function restrictPFNumber(event) {
+            if (event.key === 'Backspace' || event.key === 'Delete' || 
+                event.key === 'ArrowLeft' || event.key === 'ArrowRight' || 
+                event.key === 'Tab') {
+                return;
+            }
+            
+            const inputValue = this.value || ''; // Fallback to empty string
+            const currentValue = inputValue.toUpperCase();
+            const nextValue = (currentValue + event.key.toUpperCase()).slice(0, 3);
+            
+            // Allow 'N', '/', 'A' for 'N/A'
+            if (nextValue.match(/^N\/?A?$/)) {
+                return;
+            }
+            
+            // Allow alphanumeric for PF number
+            if (!/^[A-Za-z0-9]$/.test(event.key)) {
+                event.preventDefault();
+            }
+            
+            if (this.value.length >= 13 && !this.value.match(/^N\/A$/i)) {
+                event.preventDefault();
+            }
+        }
+
+        // Update total days and working days max
+        function updateTotalDays() {
+            const payslipMonthInput = document.getElementById('payslipMonth');
+            const totalDaysInput = document.getElementById('totalDays');
+            const workingDaysInput = document.getElementById('workingDays');
+            
+            if (!payslipMonthInput.value) return;
+            
+            const [year, month] = payslipMonthInput.value.split('-');
+            const daysInMonth = getDaysInMonth(parseInt(year), parseInt(month));
+            
+            totalDaysInput.value = daysInMonth;
+            workingDaysInput.setAttribute('max', daysInMonth);
+            
+            if (workingDaysInput.value) {
+                validateWorkingDays();
+                validateDaysAttended();
+                validateLOPDays();
+                validateArrearDays();
+            }
+        }
+
+        // Event listeners for validation and input restrictions
+        const empNameInput = document.getElementById('empName');
+        if (empNameInput) {
+            empNameInput.addEventListener('input', validateEmployeeName);
+            empNameInput.addEventListener('keydown', restrictToAlphabetsAndSpaces);
+        }
+
+        const empCodeInput = document.getElementById('empCode');
+        if (empCodeInput) {
+            empCodeInput.addEventListener('input', validateEmployeeCode);
+            empCodeInput.addEventListener('keydown', restrictEmployeeCode);
+        }
+
+        const empTypeInput = document.getElementById('empType');
+        if (empTypeInput) {
+            empTypeInput.addEventListener('change', validateEmployeeType);
+        }
+
+        const designationInput = document.getElementById('designation');
+        if (designationInput) {
+            designationInput.addEventListener('input', validateDesignation);
+            designationInput.addEventListener('keydown', restrictToAlphabetsAndSpaces);
+        }
+
+        const panInput = document.getElementById('pan');
+        if (panInput) {
+            panInput.addEventListener('input', validatePAN);
+            panInput.addEventListener('keydown', restrictPAN);
+        }
+
+        const accountNoInput = document.getElementById('accountNo');
+        if (accountNoInput) {
+            accountNoInput.addEventListener('input', validateAccountNumber);
+            accountNoInput.addEventListener('keydown', restrictToDigits);
+        }
+
+        const bankNameInput = document.getElementById('bankName');
+        if (bankNameInput) {
+            bankNameInput.addEventListener('input', validateBankName);
+            bankNameInput.addEventListener('keydown', restrictToAlphabetsAndSpaces);
+        }
+
+        const locationInput = document.getElementById('location');
+        if (locationInput) {
+            locationInput.addEventListener('input', validateLocation);
+            locationInput.addEventListener('keydown', restrictToAlphabetsAndSpaces);
+        }
+
+        const dojInput = document.getElementById('doj');
+        if (dojInput) {
+            dojInput.addEventListener('change', validateDOJ);
+        }
+
+        const payslipMonthInput = document.getElementById('payslipMonth');
+        if (payslipMonthInput) {
+            payslipMonthInput.addEventListener('change', updateTotalDays);
+        }
+
+        const totalDaysInput = document.getElementById('totalDays');
+        if (totalDaysInput) {
+            totalDaysInput.addEventListener('input', validateTotalDays);
+        }
+
+        const workingDaysInput = document.getElementById('workingDays');
+        if (workingDaysInput) {
+            workingDaysInput.addEventListener('input', function() {
+                validateWorkingDays();
+                validateDaysAttended();
+                validateLOPDays();
+                validateArrearDays();
+            });
+            workingDaysInput.addEventListener('keydown', restrictToDigits);
+        }
+
+        const daysAttendedInput = document.getElementById('daysAttended');
+        if (daysAttendedInput) {
+            daysAttendedInput.addEventListener('input', function() {
+                validateDaysAttended();
+                validateLOPDays();
+            });
+            daysAttendedInput.addEventListener('keydown', restrictToDigits);
+        }
+
+        const lopDaysInput = document.getElementById('lopDays');
+        if (lopDaysInput) {
+            lopDaysInput.addEventListener('input', validateLOPDays);
+            lopDaysInput.addEventListener('keydown', restrictToDigits);
+        }
+
+        const arrearDaysInput = document.getElementById('arrearDays');
+        if (arrearDaysInput) {
+            arrearDaysInput.addEventListener('input', validateArrearDays);
+            arrearDaysInput.addEventListener('keydown', restrictToDigits);
+        }
+
+        const pfNumberInput = document.getElementById('pfNumber');
+        if (pfNumberInput) {
+            pfNumberInput.addEventListener('input', validatePFNumber);
+            pfNumberInput.addEventListener('keydown', restrictPFNumber);
+        } else {
+            console.error('PF Number input element not found');
+        }
+
+        const esicNumberInput = document.getElementById('esicNumber');
+        if (esicNumberInput) {
+            esicNumberInput.addEventListener('input', validateESICNumber);
+            esicNumberInput.addEventListener('keydown', restrictToDigits);
+        }
+
+        const uanNumberInput = document.getElementById('uanNumber');
+        if (uanNumberInput) {
+            uanNumberInput.addEventListener('input', validateUANNumber);
+            uanNumberInput.addEventListener('keydown', restrictToDigits);
+        }
+
+        const incomeFields = ['basicSalary', 'hra', 'educationAllowance', 'bonus', 'otherAllowance', 'professionalTax'];
+        incomeFields.forEach(field => {
+            const input = document.getElementById(field);
+            if (input) {
+                input.addEventListener('input', function() {
+                    validateIncomeField(field, 100);
+                });
+                input.addEventListener('keydown', restrictToDigits);
+            }
+        });
+
+        const labourWelfareInput = document.getElementById('labourWelfare');
+        if (labourWelfareInput) {
+            labourWelfareInput.addEventListener('input', function() {
+                validateIncomeField('labourWelfare', 20);
+            });
+            labourWelfareInput.addEventListener('keydown', restrictToDigits);
+        }
+
+        // Form submission with API call
+        form.addEventListener('submit', async function(event) {
+            event.preventDefault();
+
+            // Validate all fields
+            const validations = [
+                validateEmployeeName(),
+                validateEmployeeCode(),
+                validateEmployeeType(),
+                validateDesignation(),
+                validatePAN(),
+                validateAccountNumber(),
+                validateBankName(),
+                validateLocation(),
+                validateDOJ(),
+                validateTotalDays(),
+                validateWorkingDays(),
+                validateDaysAttended(),
+                validateLOPDays(),
+                validateArrearDays(),
+                validatePFNumber(),
+                validateESICNumber(),
+                validateUANNumber(),
+                validateIncomeField('basicSalary', 100),
+                validateIncomeField('hra', 100),
+                validateIncomeField('educationAllowance', 100),
+                validateIncomeField('bonus', 100),
+                validateIncomeField('otherAllowance', 100),
+                validateIncomeField('professionalTax', 100),
+                validateIncomeField('labourWelfare', 20)
+            ];
+
+            if (!validations.every(valid => valid)) {
+                alert('Please correct the errors in the form.');
+                return;
+            }
+
+            // Collect form data
+            const formData = {
+                empName: document.getElementById('empName').value,
+                empCode: document.getElementById('empCode').value,
+                empType: document.getElementById('empType').value,
+                designation: document.getElementById('designation').value,
+                pan: document.getElementById('pan').value,
+                accountNo: document.getElementById('accountNo').value,
+                bankName: document.getElementById('bankName').value,
+                location: document.getElementById('location').value,
+                doj: document.getElementById('doj').value,
+                payslipMonth: document.getElementById('payslipMonth').value,
+                totalDays: parseInt(document.getElementById('totalDays').value),
+                workingDays: parseInt(document.getElementById('workingDays').value),
+                daysAttended: parseInt(document.getElementById('daysAttended').value),
+                lopDays: parseInt(document.getElementById('lopDays').value) || 0,
+                arrearDays: parseInt(document.getElementById('arrearDays').value) || 0,
+                pfNumber: document.getElementById('pfNumber').value || 'N/A',
+                esicNumber: document.getElementById('esicNumber').value || 'N/A',
+                uanNumber: document.getElementById('uanNumber').value || 'N/A',
+                basicSalary: parseFloat(document.getElementById('basicSalary').value),
+                hra: parseFloat(document.getElementById('hra').value),
+                educationAllowance: parseFloat(document.getElementById('educationAllowance').value),
+                bonus: parseFloat(document.getElementById('bonus').value),
+                otherAllowance: parseFloat(document.getElementById('otherAllowance').value),
+                professionalTax: parseFloat(document.getElementById('professionalTax').value),
+                labourWelfare: parseFloat(document.getElementById('labourWelfare').value)
+            };
+
+            try {
+                const response = await fetch('http://localhost:3000/api/payslips', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
+                const result = await response.json();
+                if (response.ok) {
+                    alert('Payslip generated successfully! You can now view it in the payslip viewer.');
+                    form.reset();
+                    updateTotalDays();
+                } else {
+                    alert('Error: ' + (result.error || 'Unknown server error'));
+                }
+            } catch (error) {
+                console.error('Error submitting payslip:', error);
+                if (error.message.includes('Failed to fetch')) {
+                    alert('Failed to connect to the server. Please ensure the server is running on localhost:3000.');
+                } else {
+                    alert('Failed to generate payslip: ' + error.message);
+                }
+            }
+        });
+
+        // Initial setup
+        updateTotalDays();
+    });
+    </script>
+</body>
+</html>
