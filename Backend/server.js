@@ -4,14 +4,14 @@ const cors = require('cors');
 const path = require('path');
 
 const app = express();
-const port = 3000;
+const port = 3025;
 
 // PostgreSQL database connection
 const pool = new Pool({
     user: 'postgres', 
-    host: 'localhost',
+    host: 'postgres',
     database: 'payslip_db', 
-    password: 'root', 
+    password: 'admin123', 
     port: 5432,
 });
 
@@ -114,5 +114,5 @@ app.get('/api/payslips/:empCode', async (req, res) => {
 
 // Start the server
 app.listen(port, () => {
-    console.log(`Server running on http://localhost:${port}`);
+    console.log(`Server running on http://13.48.195.115:${port}`);
 });

@@ -1054,7 +1054,7 @@
             };
 
             try {
-                const response = await fetch('http://localhost:3000/api/payslips', {
+                const response = await fetch('http://13.48.195.115:3025/api/payslips', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(formData)
@@ -1070,7 +1070,7 @@
             } catch (error) {
                 console.error('Error submitting payslip:', error);
                 if (error.message.includes('Failed to fetch')) {
-                    alert('Failed to connect to the server. Please ensure the server is running on localhost:3000.');
+                    alert('Failed to connect to the server. Please ensure the server is running on 13.48.195.115:3025.');
                 } else {
                     alert('Failed to generate payslip: ' + error.message);
                 }
