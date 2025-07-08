@@ -10,7 +10,7 @@ services:
       POSTGRES_PASSWORD: admin123
       POSTGRES_DB: payslip_db
     ports:
-      - "5456:5432"
+      - "5609:5432"
     volumes:
       - pgdata_payslip:/var/lib/postgresql/data
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
@@ -31,11 +31,11 @@ services:
       DB_NAME: payslip_db
       DB_USER: postgres
       DB_PASSWORD: admin123
-      PORT: 3025
+      PORT: 3609
     volumes:
       - ./Backend/public:/app/public          # static HTML/CSS/JS (optional)
     ports:
-      - "3025:3025"
+      - "3609:3609"
     networks:
       - payslip-net
 
@@ -48,7 +48,7 @@ services:
     depends_on:
       - backend
     ports:
-      - "8160:80"
+      - "8618:80"
     networks:
       - payslip-net
 
@@ -61,7 +61,7 @@ services:
     depends_on:
       - backend
     ports:
-      - "8161:80"
+      - "8619:80"
     networks:
       - payslip-net
 
