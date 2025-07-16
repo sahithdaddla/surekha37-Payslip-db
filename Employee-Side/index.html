@@ -735,7 +735,7 @@
             document.getElementById('no-results').style.display = 'none';
 
             try {
-                const response = await fetch(`http://56.228.41.185:3609/api/payslips/${employeeId}/${payslipMonth}`);
+                const response = await fetch(`http://16.171.136.8:3609/api/payslips/${employeeId}/${payslipMonth}`);
                 if (!response.ok) {
                     throw new Error((await response.json()).error || 'No payslip found');
                 }
