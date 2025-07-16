@@ -21,7 +21,7 @@ services:
     build:
       context: ./Backend
       dockerfile: Dockerfile
-    container_name: payslip-backend
+    container_name: payslip37-backend
     restart: unless-stopped
     depends_on:
       - postgres
@@ -43,7 +43,7 @@ services:
     build:
       context: ./Employee-Side
       dockerfile: Dockerfile
-    container_name: payslip-ui-employee
+    container_name: payslip37-ui-employee
     restart: unless-stopped
     depends_on:
       - backend
@@ -56,7 +56,7 @@ services:
     build:
       context: ./HR-Side
       dockerfile: Dockerfile
-    container_name: payslip-ui-hr
+    container_name: payslip37-ui-hr
     restart: unless-stopped
     depends_on:
       - backend
